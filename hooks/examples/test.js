@@ -94,12 +94,26 @@ async function startTest(gridUrl, capabilities, name) {
   console.log(caps.name, " : Setup Time :", duration.asSeconds());
 
   // navigate to a url
-  let url = "https://www.lambdatest.com";
+  let url = "https://devci.worksonlocal.dev/tests/player-dynamic/#/testbed?manifest=visual-regression-multiple-choice";
   console.log(url);
   await driver
     .get(url)
     .then(function () {
       const session = driver.getSession();
+      const { JSDOM } = require('jsdom');
+
+// Simulate a document
+const dom = new JSDOM(`<body><div id="target" style="display: block;">Visible</div></body>`);
+global.window = dom.window;
+global.document = dom.window.document;
+
+function isDisplayed(elem) {
+  return !!(elem.offsetWidth || elem.offsetHeight || elem.getClientRects().length);
+}
+
+const target = document.getElementById("target");
+
+console.log("Element is displayed:", isDisplayed(target));
 
       // For Smartui TakeScreenshot
       setTimeout(function () {
