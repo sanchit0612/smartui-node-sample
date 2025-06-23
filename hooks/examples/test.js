@@ -96,6 +96,7 @@ async function startTest(gridUrl, capabilities, name) {
   // navigate to a url
   let url = "https://devci.worksonlocal.dev/tests/player-dynamic/#/testbed?manifest=visual-regression-multiple-choice";
 
+
   console.log(url);
   try {
     await driver.get(url);
@@ -286,5 +287,39 @@ async function startTest(gridUrl, capabilities, name) {
       console.log("Driver quit error after failure (this is normal):", quitErr.message);
     }
   }
+
+  console.log(url);
+  await driver
+    .get(url)
+    .then(function () {
+      const session = driver.getSession();
+     
+      // For Smartui TakeScreenshot
+      setTimeout(function () {
+        console.log("taking screenshot ...")
+        let config = {
+          screenshotName: "web-page"
+        };
+        driver.executeScript("smartui.takeScreenshot", config).then(out => {
+          console.log("RESPONSE :", out)
+          return
+        });
+      }, waitTime * 1000);
+
+
+      driver.getTitle().then(function (title) {
+        setTimeout(function () {
+          driver.executeScript("lambda-status=passed");
+          driver.quit();
+        }, 15000);
+      });
+    })
+    .catch(function (err) {
+      error = JSON.stringify(err);
+      console.log(error);
+      console.log("test failed with reason " + err);
+      driver.executeScript("lambda-status=failed");
+      driver.quit();
+    });
 }
 
